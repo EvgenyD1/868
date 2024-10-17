@@ -1,0 +1,44 @@
+
+
+version: '3.9'
+
+#networks:
+#  dev_network:
+
+services:
+
+  db:
+    image: postgres:14.3-alpine3.15
+    ports:
+      - "5444:5432"
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: netology_flask
+
+    #networks:
+    #  dev_network:
+    #    aliases:
+    #      - db-main
+
+  app:
+    build:
+      context: .
+    environment:
+      PG_DSN: postgresql://app:1234@db:5432/netology_flask
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    #networks:
+    #  dev_network:
+    #    aliases:
+    #      - flask_api
+    restart:
+      always
+    volumes:
+      - ./app:/app
+    working_dir: /app     
+    entrypoint: sh ./run.sh  
+    #entrypoint: python3 main.py
+    #entrypoint: PYTHONUNBUFFERED=TRUE gunicorn -b 0.0.0.0:5000 main:app --capture-output
